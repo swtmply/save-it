@@ -1,12 +1,7 @@
-import { UserButton } from "@clerk/nextjs";
+import CenterWrapper from "@/components/center-wrapper";
 
 const RootPage = async () => {
-  return (
-    <div className="flex min-h-screen max-h-screen">
-      Hello
-      <UserButton afterSignOutUrl="/sign-in" />
-    </div>
-  );
+  return <CenterWrapper>Hello</CenterWrapper>;
 };
 
 export default RootPage;
