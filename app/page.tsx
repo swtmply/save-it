@@ -1,7 +1,7 @@
+import AddAccountSheet from "@/components/add-account-sheet";
 import CenterWrapper from "@/components/center-wrapper";
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import OverviewChart from "@/components/overview-chart";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -22,7 +22,7 @@ const RootPage = async () => {
           <h3 className="text-3xl font-bold">Dashboard</h3>
           <div className="flex gap-4">
             <CalendarDateRangePicker />
-            <Button>New Account</Button>
+            <AddAccountSheet />
           </div>
         </div>
         <Card className="col-span-3">

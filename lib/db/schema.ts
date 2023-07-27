@@ -9,7 +9,7 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 
-export const account = mysqlTable("account", {
+export const accounts = mysqlTable("account", {
   id: serial("id").primaryKey(),
   type: mysqlEnum("type", ["income", "expense"]).notNull().default("income"),
   category: text("category"),
@@ -18,4 +18,4 @@ export const account = mysqlTable("account", {
   userId: varchar("userId", { length: 191 }).notNull(),
 });
 
-export type Account = InferModel<typeof account>;
+export type Account = InferModel<typeof accounts>;
