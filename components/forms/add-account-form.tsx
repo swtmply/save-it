@@ -56,7 +56,6 @@ const AddAccountForm = ({ closeSheet }: AddAccountFormProps) => {
     resolver: zodResolver(accountFormSchema),
     defaultValues: {
       amount: "0",
-      category: "",
       date: new Date(),
     },
   });

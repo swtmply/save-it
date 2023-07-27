@@ -2,19 +2,61 @@ import AddAccountSheet from "@/components/add-account-sheet";
 import CenterWrapper from "@/components/center-wrapper";
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import OverviewChart from "@/components/overview-chart";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { incomeExpenseData } from "@/lib/mock/data";
-import { DollarSign, PiggyBank } from "lucide-react";
-import { Fragment } from "react";
+import RecentAccountsCard from "@/components/recent-accounts-card";
+import SummaryCard from "@/components/summary-card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { db } from "@/lib/db";
+import { Account, accounts as dbAccounts } from "@/lib/db/schema";
 
 const RootPage = async () => {
+  const accounts = (await db.select().from(dbAccounts)).reverse();
+
+  const totalIncomes = accounts.reduce(
+    (prev, current) =>
+      current.type === "income" ? prev + Number(current.amount) : prev,
+    0
+  );
+  const totalExpenses = accounts.reduce(
+    (prev, current) =>
+      current.type === "expense" ? prev + Number(current.amount) : prev,
+    0
+  );
+
+  const highestIncome = accounts.reduce(
+    (prev, current) =>
+      current.type === "income"
+        ? prev.amount > current.amount
+          ? prev
+          : current
+        : prev,
+    {} as Account
+  );
+
+  const highestExpense = accounts.reduce(
+    (prev, current) =>
+      current.type === "expense"
+        ? prev.amount > current.amount
+          ? prev
+          : current
+        : prev,
+    {} as Account
+  );
+
+  const summaryCardsData = [
+    { title: "Total Expenses", amount: totalExpenses, description: "" },
+    {
+      title: "Largest Spending",
+      amount: Number(highestExpense.amount),
+      description: highestExpense.category,
+    },
+    { title: "Total Incomes", amount: totalIncomes, description: "" },
+    {
+      title: "Largest Income",
+      amount: Number(highestIncome.amount),
+      description: highestIncome.category,
+    },
+  ];
+
   return (
     <CenterWrapper>
       <div className="grid grid-cols-12 gap-4">
@@ -25,78 +67,9 @@ const RootPage = async () => {
             <AddAccountSheet />
           </div>
         </div>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>
-              <span className="text-sm">Total Expenses</span>
-            </CardTitle>
-            <CardContent className="p-0">
-              <p className="font-bold text-2xl">
-                {Intl.NumberFormat("en-US", {
-                  currency: "PHP",
-                  style: "currency",
-                }).format(100000)}
-              </p>
-            </CardContent>
-            <CardFooter className="p-0 text-sm text-slate-500">
-              -20% this month.
-            </CardFooter>
-          </CardHeader>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>
-              <span className="text-sm">Largest Spending</span>
-            </CardTitle>
-            <CardContent className="p-0">
-              <p className="font-bold text-2xl">
-                {Intl.NumberFormat("en-US", {
-                  currency: "PHP",
-                  style: "currency",
-                }).format(100000)}
-              </p>
-            </CardContent>
-            <CardFooter className="p-0 text-sm text-slate-500">
-              Shopping Clothes
-            </CardFooter>
-          </CardHeader>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>
-              <span className="text-sm">Total Incomes</span>
-            </CardTitle>
-            <CardContent className="p-0">
-              <p className="font-bold text-2xl">
-                {Intl.NumberFormat("en-US", {
-                  currency: "PHP",
-                  style: "currency",
-                }).format(100000)}
-              </p>
-            </CardContent>
-            <CardFooter className="p-0 text-sm text-slate-500">
-              +30% this month.
-            </CardFooter>
-          </CardHeader>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>
-              <span className="text-sm">Largest Income</span>
-            </CardTitle>
-            <CardContent className="p-0">
-              <p className="font-bold text-2xl">
-                {Intl.NumberFormat("en-US", {
-                  currency: "PHP",
-                  style: "currency",
-                }).format(100000)}
-              </p>
-            </CardContent>
-            <CardFooter className="p-0 text-sm text-slate-500">
-              Lazhopee
-            </CardFooter>
-          </CardHeader>
-        </Card>
+        {summaryCardsData.map((cardData) => (
+          <SummaryCard key={cardData.title} {...cardData} />
+        ))}
         <Card className="col-span-7 max-h-[430px]">
           <CardHeader>
             <CardTitle>Overview</CardTitle>
@@ -105,58 +78,7 @@ const RootPage = async () => {
             <OverviewChart />
           </CardContent>
         </Card>
-        <Card className="col-span-5 max-h-[430px]">
-          <CardHeader>
-            <CardTitle>Recent Incomes and Expenses</CardTitle>
-            <CardDescription>
-              List of your recent incomes and expenses this month.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-6">
-            {incomeExpenseData.map((data) => {
-              return (
-                <Fragment key={data.id}>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-slate-200 rounded-full w-10 max-h-10 aspect-square flex justify-center items-center">
-                        {data.type === "income" ? (
-                          <PiggyBank className="w-5 h-5" />
-                        ) : (
-                          <DollarSign className="w-5 h-5" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{data.category}</p>
-                        <span className="text-xs text-slate-500 capitalize">
-                          {data.type}
-                        </span>
-                      </div>
-                    </div>
-                    <p className="font-medium text-lg">
-                      {data.type === "income" ? (
-                        <>
-                          +
-                          {Intl.NumberFormat("en-US", {
-                            currency: "PHP",
-                            style: "currency",
-                          }).format(Number(data.amount))}
-                        </>
-                      ) : (
-                        <>
-                          -
-                          {Intl.NumberFormat("en-US", {
-                            currency: "PHP",
-                            style: "currency",
-                          }).format(Number(data.amount))}
-                        </>
-                      )}
-                    </p>
-                  </div>
-                </Fragment>
-              );
-            })}
-          </CardContent>
-        </Card>
+        <RecentAccountsCard accounts={accounts.slice(0, 5)} />
       </div>
     </CenterWrapper>
   );

@@ -12,7 +12,7 @@ import {
 export const accounts = mysqlTable("account", {
   id: serial("id").primaryKey(),
   type: mysqlEnum("type", ["income", "expense"]).notNull().default("income"),
-  category: text("category"),
+  category: text("category").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull().default("0"),
   date: timestamp("date"),
   userId: varchar("userId", { length: 191 }).notNull(),
