@@ -22,7 +22,7 @@ const RootPage = async () => {
           <h3 className="text-3xl font-bold">Dashboard</h3>
           <div className="flex gap-4">
             <CalendarDateRangePicker />
-            <Button>New Income/Expense</Button>
+            <Button>New Account</Button>
           </div>
         </div>
         <Card className="col-span-3">
@@ -139,7 +139,7 @@ const RootPage = async () => {
                           {Intl.NumberFormat("en-US", {
                             currency: "PHP",
                             style: "currency",
-                          }).format(data.amount)}
+                          }).format(Number(data.amount))}
                         </>
                       ) : (
                         <>
@@ -147,7 +147,7 @@ const RootPage = async () => {
                           {Intl.NumberFormat("en-US", {
                             currency: "PHP",
                             style: "currency",
-                          }).format(data.amount)}
+                          }).format(Number(data.amount))}
                         </>
                       )}
                     </p>
