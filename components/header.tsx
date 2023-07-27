@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const Header = () => {
   return (
-    <div className="flex justify-between py-4 px-2">
+    <div className="flex justify-between py-4">
       <div className="flex items-center gap-3">
         <Image
           src="/saveit-logo.svg"
