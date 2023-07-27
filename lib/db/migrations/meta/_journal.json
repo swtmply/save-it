@@ -8,6 +8,13 @@
       "when": 1690445963256,
       "tag": "0000_regular_nehzno",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1690454469378,
+      "tag": "0001_tough_excalibur",
+      "breakpoints": true
     }
   ]
 }
