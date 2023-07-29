@@ -1,61 +1,45 @@
+import { getUserAccountByDay, getUserAccounts } from "@/actions/account";
 import AddAccountSheet from "@/components/add-account-sheet";
 import CenterWrapper from "@/components/center-wrapper";
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import OverviewChart from "@/components/overview-chart";
-import RecentAccountsCard from "@/components/recent-accounts-card";
-import SummaryCard from "@/components/summary-card";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { db } from "@/lib/db";
-import { Account, accounts as dbAccounts } from "@/lib/db/schema";
+import SummaryCards from "@/components/summary-cards";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { AccountList, AccountListItem } from "../components/account-list";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from "next/link";
+import { getDaysInMonth } from "date-fns";
+
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 const RootPage = async () => {
-  const accounts = (await db.select().from(dbAccounts)).reverse();
-
-  const totalIncomes = accounts.reduce(
-    (prev, current) =>
-      current.type === "income" ? prev + Number(current.amount) : prev,
-    0
+  const accounts = await getUserAccounts();
+  const dayAccounts = accounts.filter(
+    (account) =>
+      Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(
+        account.date
+      ) ===
+      Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(new Date())
   );
-  const totalExpenses = accounts.reduce(
-    (prev, current) =>
-      current.type === "expense" ? prev + Number(current.amount) : prev,
-    0
-  );
-
-  const highestIncome = accounts.reduce(
-    (prev, current) =>
-      current.type === "income"
-        ? prev.amount > current.amount
-          ? prev
-          : current
-        : prev,
-    {} as Account
-  );
-
-  const highestExpense = accounts.reduce(
-    (prev, current) =>
-      current.type === "expense"
-        ? prev.amount > current.amount
-          ? prev
-          : current
-        : prev,
-    {} as Account
-  );
-
-  const summaryCardsData = [
-    { title: "Total Expenses", amount: totalExpenses, description: "" },
-    {
-      title: "Largest Spending",
-      amount: Number(highestExpense.amount),
-      description: highestExpense.category,
-    },
-    { title: "Total Incomes", amount: totalIncomes, description: "" },
-    {
-      title: "Largest Income",
-      amount: Number(highestIncome.amount),
-      description: highestIncome.category,
-    },
-  ];
 
   return (
     <CenterWrapper>
@@ -67,18 +51,73 @@ const RootPage = async () => {
             <AddAccountSheet />
           </div>
         </div>
-        {summaryCardsData.map((cardData) => (
-          <SummaryCard key={cardData.title} {...cardData} />
-        ))}
-        <Card className="col-span-7 max-h-[430px]">
+        <SummaryCards accounts={accounts} />
+        <Card className="col-span-7 max-h-[450px] min-h-[450px]">
+          <Tabs defaultValue="year">
+            <CardHeader className="flex-row justify-between">
+              <CardTitle>Overview</CardTitle>
+              <TabsList className="grid w-[300px] grid-cols-3 !m-0">
+                <TabsTrigger value="year">Year</TabsTrigger>
+                <TabsTrigger value="month">Month</TabsTrigger>
+                <TabsTrigger value="day">Day</TabsTrigger>
+              </TabsList>
+            </CardHeader>
+            <CardContent>
+              <TabsContent value="year">
+                <OverviewChart
+                  type="year"
+                  data={months.map((month) => ({
+                    name: month,
+                    // TODO get expense income for the month
+                    expense: Math.floor(Math.random() * 50000) + 10000,
+                    income: Math.floor(Math.random() * 50000) + 10000,
+                  }))}
+                />
+              </TabsContent>
+              <TabsContent value="month">
+                <OverviewChart
+                  type="month"
+                  data={[...new Array(getDaysInMonth(new Date())).keys()].map(
+                    (day) => ({
+                      date: day + 1,
+                      expense: Math.floor(Math.random() * 50000) + 10000,
+                      income: Math.floor(Math.random() * 50000) + 10000,
+                    })
+                  )}
+                />
+              </TabsContent>
+              <TabsContent value="day">
+                <OverviewChart
+                  type="day"
+                  data={dayAccounts.map((account) => ({
+                    accountType: account.type,
+                    value: Number(account.amount),
+                  }))}
+                />
+              </TabsContent>
+            </CardContent>
+          </Tabs>
+        </Card>
+        <Card className="col-span-5 max-h-[450px] min-h-[450px]">
           <CardHeader>
-            <CardTitle>Overview</CardTitle>
+            <CardTitle>Recent Incomes and Expenses</CardTitle>
+            <CardDescription>
+              List of your recent incomes and expenses this month.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <OverviewChart />
+            <AccountList>
+              {accounts.slice(0, 5).map((account) => {
+                return <AccountListItem key={account.id} account={account} />;
+              })}
+            </AccountList>
+            <Link href="/accounts" className="flex justify-center p-2">
+              <p className="text-sm text-blue-500 hover:underline">
+                See more...
+              </p>
+            </Link>
           </CardContent>
         </Card>
-        <RecentAccountsCard accounts={accounts.slice(0, 5)} />
       </div>
     </CenterWrapper>
   );

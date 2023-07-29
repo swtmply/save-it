@@ -14,7 +14,7 @@ export const accounts = mysqlTable("account", {
   type: mysqlEnum("type", ["income", "expense"]).notNull().default("income"),
   category: text("category").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull().default("0"),
-  date: timestamp("date"),
+  date: timestamp("date").notNull().defaultNow(),
   userId: varchar("userId", { length: 191 }).notNull(),
 });
 
