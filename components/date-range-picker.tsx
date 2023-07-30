@@ -19,18 +19,18 @@ export function CalendarDateRangePicker({
   });
 
   return (
-    <div className={cn("grid gap-2", className)}>
+    <div className={cn("lg:grid gap-2 hidden", className)}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             id="date"
             variant={"outline"}
             className={cn(
-              "w-[260px] justify-start text-left font-normal",
+              "w-[250px] justify-start text-left font-normal",
               !date && "text-muted-foreground"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+            <CalendarIcon className="mr-3 h-4 w-4" />
             {date?.from ? (
               date.to ? (
                 <>

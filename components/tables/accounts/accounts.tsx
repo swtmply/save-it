@@ -1,9 +1,9 @@
 "use client";
 
-import type { IncomeExpense } from "@/lib/mock/data";
+import { Account } from "@/lib/db/schema";
 import { ColumnDef } from "@tanstack/react-table";
 
-export const incomeExpenseColumns: ColumnDef<IncomeExpense>[] = [
+export const accountColumns: ColumnDef<Account>[] = [
   {
     accessorKey: "type",
     header: "Type",

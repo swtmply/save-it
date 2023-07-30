@@ -10,13 +10,12 @@ import { Calendar } from "./ui/calendar";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 import { ControllerRenderProps } from "react-hook-form";
-import { AddAccountFormType } from "./forms/add-account-form";
 
-const DatePicker = ({
-  field,
-}: {
-  field: ControllerRenderProps<AddAccountFormType, "date">;
-}) => {
+type DatePickerProps = {
+  field: ControllerRenderProps<any, any>;
+};
+
+const DatePicker = ({ field }: DatePickerProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
