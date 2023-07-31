@@ -1,8 +1,4 @@
-import {
-  getUserAccounts,
-  getUserDayAccountsTotal,
-  getUserMonthAccountsTotal,
-} from "@/actions/account";
+import { getUserAccounts, getUserMonthAccountsTotal } from "@/actions/account";
 import AddAccountSheet from "@/components/add-account-sheet";
 import CenterWrapper from "@/components/center-wrapper";
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
@@ -37,10 +33,6 @@ const months = [
 
 const RootPage = async () => {
   const accounts = await getUserAccounts();
-
-  const todayAccounts = await getUserDayAccountsTotal();
-
-  console.log(todayAccounts);
 
   const dayAccounts = accounts
     .filter(
