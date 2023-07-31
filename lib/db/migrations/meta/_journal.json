@@ -15,6 +15,13 @@
       "when": 1690454469378,
       "tag": "0001_tough_excalibur",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1690782485572,
+      "tag": "0002_abnormal_jack_power",
+      "breakpoints": true
     }
   ]
 }

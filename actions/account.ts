@@ -4,7 +4,7 @@ import { AddAccountFormType } from "@/components/forms/add-account-form";
 import { db } from "@/lib/db";
 import { accounts } from "@/lib/db/schema";
 import { currentUser } from "@clerk/nextjs";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function addAccountAction(input: AddAccountFormType) {
@@ -26,12 +26,17 @@ export async function getUserAccounts() {
   return userAcounts;
 }
 
-export async function getUserAccountByDay(date: Date) {
+export async function getUserMonthAccountsTotal() {
   const user = await currentUser();
   const userAcounts = await db
-    .select()
+    .select({
+      amount: sql<number>`sum(${accounts.amount})`,
+      date: accounts.date,
+      type: accounts.type,
+    })
     .from(accounts)
-    .where(and(eq(accounts.userId, user?.id!), eq(accounts.date, date)))
+    .where(eq(accounts.userId, user?.id!))
+    .groupBy(accounts.date, accounts.type)
     .orderBy(desc(accounts.date));
 
   return userAcounts;

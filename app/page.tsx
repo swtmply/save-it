@@ -1,4 +1,8 @@
-import { getUserAccountByDay, getUserAccounts } from "@/actions/account";
+import {
+  getUserAccounts,
+  getUserDayAccountsTotal,
+  getUserMonthAccountsTotal,
+} from "@/actions/account";
 import AddAccountSheet from "@/components/add-account-sheet";
 import CenterWrapper from "@/components/center-wrapper";
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
@@ -17,29 +21,58 @@ import Link from "next/link";
 import { getDaysInMonth } from "date-fns";
 
 const months = [
-  "January",
-  "February",
-  "March",
-  "April",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
   "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 const RootPage = async () => {
   const accounts = await getUserAccounts();
-  const dayAccounts = accounts.filter(
-    (account) =>
-      Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(
-        account.date
-      ) ===
-      Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(new Date())
-  );
+
+  const todayAccounts = await getUserDayAccountsTotal();
+
+  console.log(todayAccounts);
+
+  const dayAccounts = accounts
+    .filter(
+      (account) =>
+        Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(
+          account.date
+        ) ===
+        Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(new Date())
+    )
+    .reduce(
+      (prev, curr) =>
+        curr.type === "expense"
+          ? { ...prev, expense: prev.expense + Number(curr.amount) }
+          : { ...prev, income: prev.income + Number(curr.amount) },
+      { expense: 0, income: 0 }
+    );
+
+  const monthAccounts = await getUserMonthAccountsTotal();
+  const daysForMonth: { income: number; expense: number }[] = [
+    ...new Array(getDaysInMonth(new Date())),
+  ].map((day, index) => {
+    const accounts = monthAccounts.filter(
+      (account) => index === account.date.getDate() - 1
+    );
+
+    return {
+      expense:
+        accounts.find((account) => account.type === "expense")?.amount ?? 0,
+      income:
+        accounts.find((account) => account.type === "income")?.amount ?? 0,
+    };
+  });
 
   return (
     <CenterWrapper>
@@ -69,7 +102,7 @@ const RootPage = async () => {
                 <OverviewChart
                   type="year"
                   data={months.map((month) => ({
-                    name: month.slice(0, 3),
+                    name: month,
                     // TODO get expense income for the month
                     expense: Math.floor(Math.random() * 50000) + 10000,
                     income: Math.floor(Math.random() * 50000) + 10000,
@@ -79,22 +112,20 @@ const RootPage = async () => {
               <TabsContent value="month">
                 <OverviewChart
                   type="month"
-                  data={[...new Array(getDaysInMonth(new Date())).keys()].map(
-                    (day) => ({
-                      date: day + 1,
-                      expense: Math.floor(Math.random() * 50000) + 10000,
-                      income: Math.floor(Math.random() * 50000) + 10000,
-                    })
-                  )}
+                  data={daysForMonth.map((account, index) => ({
+                    date: index + 1,
+                    expense: account.expense,
+                    income: account.income,
+                  }))}
                 />
               </TabsContent>
               <TabsContent value="day">
                 <OverviewChart
                   type="day"
-                  data={dayAccounts.map((account) => ({
-                    accountType: account.type,
-                    value: Number(account.amount),
-                  }))}
+                  data={[
+                    { accountType: "expense", value: dayAccounts.expense },
+                    { accountType: "income", value: dayAccounts.income },
+                  ]}
                 />
               </TabsContent>
             </CardContent>

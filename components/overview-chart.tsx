@@ -65,27 +65,19 @@ const OverviewChart = ({ type, data }: DataTypes) => {
     //     </BarChart>
     //   ),
     month: (
-      <div className="flex flex-col justify-center items-center h-full">
-        <h3 className="text-lg font-bold">Coming Soon.</h3>
-        <p className="text-sm text-slate-500">
-          Just want to deploy a working system.
-        </p>
-      </div>
+      <LineChart data={data}>
+        <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} />
+        <YAxis
+          fontSize={12}
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={(value) => `₱${value}`}
+        />
+        <Legend />
+        <Line dataKey="income" stroke="#8884d8" />
+        <Line dataKey="expense" stroke="#82ca9d" />
+      </LineChart>
     ),
-    // (
-    //   <LineChart data={data}>
-    //     <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} />
-    //     <YAxis
-    //       fontSize={12}
-    //       tickLine={false}
-    //       axisLine={false}
-    //       tickFormatter={(value) => `₱${value}`}
-    //     />
-    //     <Legend />
-    //     <Line dataKey="income" stroke="#8884d8" />
-    //     <Line dataKey="expense" stroke="#82ca9d" />
-    //   </LineChart>
-    // ),
     day: (
       <PieChart data={data}>
         <Legend

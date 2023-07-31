@@ -1,5 +1,6 @@
 import { type InferModel } from "drizzle-orm";
 import {
+  date,
   decimal,
   mysqlEnum,
   mysqlTable,
@@ -14,7 +15,7 @@ export const accounts = mysqlTable("account", {
   type: mysqlEnum("type", ["income", "expense"]).notNull().default("income"),
   category: text("category").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull().default("0"),
-  date: timestamp("date").notNull().defaultNow(),
+  date: date("date").notNull(),
   userId: varchar("userId", { length: 191 }).notNull(),
 });
 
